@@ -1,8 +1,25 @@
 # How to use
 Exploits exist in both save game and system link forms, please follow the instructions for the exploit method you want to use.
 
+| Game | Network RCE | NTSC | PAL | Other Region | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Tony Hawk's Pro Skater 3 | ✖ | ✔ | ✖ | N/A | |
+| Tony Hawk's Pro Skater 4 | ✔ (NTSC) | ✔ | ✔ | ✔ | |
+| Tony Hawk's Underground 1 | ❌ | ❌ | ❌ | ❌ | Game compiled using stack cookies, stack buffer overflow not possible |
+| Tony Hawk's Underground 2 | ❌ | ❌ | ❌ | ❌ | Game compiled using stack cookies, stack buffer overflow not possible |
+| Tony Hawk's American Wasteland | ✖ | ✔ | ✖ | N/A | |
+
+✔ = Exploit supported and written  
+✖ = Exploitation possible but not yet written  
+❌ = Exploitation not possible
+
+**Network RCE** = Exploitation using network play (doesn't require game save or memory card)  
+**NTSC** = Save game exploit for NTSC region  
+**PAL** = Save game exploit for PAL region  
+**Other Region** = Save game exploit for other regions
+
 ## Save Game Exploit
-Exploits for the NTSC, PAL, and region free versions of THPS4 can be found in the release folder and the game saves have already been signed for use on retail Xbox consoles.
+Save game exploits in the releases download have already been signed. Please use the save game files that match the region of your game.
 
 1. Each save has a placeholder 'default.xbe' file that needs to be replaced with the xbe you want to launch that's signed using the habibi key. The xbe can be signed with the habibi key using xbetool found on xbins.
 2. Once your xbe has been signed and copied into the 41560017\3DDF5FA578FC folder you can copy the 41560017 folder to your memory card and then transfer it to your HDD. The save must be loaded from your console's HDD, loading it from  the memory card is not supported.
