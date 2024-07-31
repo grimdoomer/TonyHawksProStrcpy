@@ -1,4 +1,4 @@
-# How to use
+# How to Use
 Exploits exist in both save game and system link forms, please follow the instructions for the exploit method you want to use.
 
 | Game | Network RCE | NTSC | PAL | Other Region | Notes |
