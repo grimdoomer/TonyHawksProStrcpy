@@ -22,13 +22,13 @@ Exploits exist in both save game and system link forms, please follow the instru
 Save game exploits in the releases download have already been signed. Please use the save game files that match the region of your game.
 
 1. Each save has a placeholder 'default.xbe' file that needs to be replaced with the xbe you want to launch that's signed using the habibi RSA key. See [Xbe Signing](#xbe-signing) for instructions on how to do this. For demonstration purposes you can find the pre-signed "nyan-cat" test xbe in the "TonyHawksProStrcpy-Demo-Executables.zip" file in the releases section.
-2. Once your xbe has been signed and copied into the 41560017\3DDF5FA578FC folder you can copy the 41560017 folder to your memory card and then transfer it to your console's HDD. The save must be loaded from your console's HDD, loading it from the memory card is not supported.
-3. Launch Tony Hawk's Pro Skater 4 and choose free skate.
+2. Once your xbe has been signed and copied into the 41560XXX\3DDF5FA578FC folder you can copy the 41560XXX folder to your memory card and then transfer it to your console's HDD. The save must be loaded from your console's HDD, loading it from the memory card is not supported.
+3. Launch the Tony Hawk game you're using for the exploit and choose the free skate option from the main menu (varies slightly per game).
 4. When you get to the level select screen choose "custom park" and load the "Hack Xbox" game save.
-5. After the save is loaded choose "start game" and the exploit should trigger during the loading screen.
+5. After the save is loaded choose "start game". Depending on what version of the game you're using the exploit should trigger during the loading screen. For Tony Hawk's Pro Skater 3 you'll you'll need to wait until the player spawns in and then press pause and quit back to the main menu which should trigger the exploit.
 
 ## SystemLink Exploit
-The system link exploit is currently only supported on the NTSC version of the game. The exploit works by running a patched version of the game on an already modded Xbox that will act as the host of the match. When the client joins the match the host will send the malicious park file to the client and get code execution on their console. Then a file transfer will start and send an arbitrary xbe file to the client that gets saved on their HDD. Once the file transfer completes the client will launch the xbe file, typically a softmod installer xbe, and allow them to softmod their console. 
+The system link exploit is currently only supported on the NTSC version of Tony Hawk's Pro Skater 4. The exploit works by running a patched version of the game on an already modded Xbox that will act as the host of the match. When the client joins the match the host will send the malicious park file to the client and get code execution on their console. Then a file transfer will start and send an arbitrary xbe file to the client that gets saved on their HDD. Once the file transfer completes the client will launch the xbe file, typically a softmod installer xbe, and allow them to softmod their console. 
 
 The exploit files for the host have only been tested on an Xbox console, it's unknown if they work using an emulator or not. The host must patch their game xbe with the "TonyHawkProSkater4-SystemLink-Host-NTSC" patch and load the save game file in the "SystemLink" folder. The other game saves will NOT work with the network exploit.
 
@@ -54,24 +54,33 @@ During the exploit the client's console will change the LED color to indicate wh
 To compile the exploit files you'll need XePatcher 2.9 or newer, to compile the host xbe pathes for the system link exploit you'll also need [XboxImageXploder](https://github.com/grimdoomer/XboxImageXploder).
 
 ## Save Game Exploits
-The game save expoits can be compiled using the following XePatcher command: 
+The game save expoits can be compiled and applied to the save files using the following XePatcher command: 
 ```
 XePatcher.exe -p <patch file> -proc x86 -b <save game file>
 
 Ex: XePatcher.exe -p ".\Xbox\Tony Hawk's Pro Skater 4\TonyHawkProSkater4-NTSC.asm" -proc x86 -bin ".\Release\Xbox\Tony Hawk's Pro Skater 4\NTSC\41560017\3DDF5FA578FC\3DDF5FA578FC"
 ```
 
+You must apply the patch to the corresponding save file for the version of the game you chose (ie: the american wasteland patch must be used with the american wasteland save files).
+
 After the save game files have been patched you'll need to resign them using the TonyHawkSaveSigner python3 script using the following command: 
 ```
-python TonyHawkSaveSigner.py thps4 xbox <save file>
+python TonyHawkSaveSigner.py <game version> xbox <save file>
 
 Ex: python TonyHawkSaveSigner.py thps4 xbox ".\Release\Xbox\Tony Hawk's Pro Skater 4\NTSC\41560017\3DDF5FA578FC\3DDF5FA578FC"
 ```
 
-## SystemLink Exploit
-The save game for the system link exploit can be compiled using the instructions above with the "TonyHawksProSkater4-SystemLink-NTSC.asm" file.
+The possible game versions are: 
+- thps3 = Tony Hawk's Pro Skater 3
+- thps4 = Tony Hawk's Pro Skater 4
+- thaw = Tony Hawk's American Wasteland
 
-To build the host xbe file you must first use XboxImageXploder to add a new code segment to a clean default.xbe from the NTSC version of the game:
+You must use the correct game id for the version of the game you're patching or the save file will not work and appear as "damaged" on the console.
+
+## SystemLink Exploit
+The save game for the system link exploit can be compiled using the instructions above with the "TonyHawksProSkater4-SystemLink-NTSC.asm" file. It must be applied to the Tony Hawk's Pro Skater 4 save file.
+
+To build the host xbe file you must first use XboxImageXploder to add a new code segment to a clean default.xbe from the NTSC version of the game (SHA1: 22607A9C6DA95813884139E8A20971C4C3D23517):
 ```
 XboxImageXploder.exe <xbe file> .hacks 1500
 ```
