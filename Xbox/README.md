@@ -80,12 +80,19 @@ You must use the correct game id for the version of the game you're patching or 
 ## SystemLink Exploit
 The save game for the system link exploit can be compiled using the instructions above with the "TonyHawksProSkater4-SystemLink-NTSC.asm" file. It must be applied to the Tony Hawk's Pro Skater 4 save file.
 
-To build the host xbe file you must first use XboxImageXploder to add a new code segment to a clean default.xbe from the NTSC version of the game (SHA1: 22607A9C6DA95813884139E8A20971C4C3D23517):
+To build the host xbe file you must first use XboxImageXploder v1.1 to add a new code segment to a clean default.xbe from the NTSC version of the game (SHA1: 22607A9C6DA95813884139E8A20971C4C3D23517):
 ```
-XboxImageXploder.exe <xbe file> .hacks 1500
+XboxImageXploder.exe <xbe file> .hacks 4096
 ```
 
-The "Virtual Address" for the .hacks segment must be 0x0030b280, if any other value is displayed the xbe will not work with the patch file.
+The output from XboxImageXploder should match the following, if it doesn't the patch will not work:
+```
+Section Name:           .hacks
+Virtual Address:        0x0030c000
+Virtual Size:           0x00001000
+File Offset:            0x001d1000
+File Size:              0x00001000
+```
 
 Once the new code segment is added you can compile and apply the host patches to the xbe file using the following XePatcher command:
 ```
