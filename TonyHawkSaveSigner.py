@@ -243,8 +243,85 @@ class XboxSaveSigner:
         # Done, return true.
         return True
     
+
+class Ps2SaveSigner:
+
+    def signTonyHawksProSkater3(self, args, file) -> bool:
+    
+        # Not supported.
+        print("Game not supported for this platform")
+        
+
+    def signTonyHawksProSkater4(self, args, file) -> bool:
+    
+        # Get the size of the save file.
+        fileSize = getFileSize(file)
+        if fileSize != 0x4000:
+        
+            # File is invalid.
+            print("Error park file is incorrect size!")
+            return False
+
+        # Read the file into a buffer we can work with.
+        saveData = bytearray(file.read(fileSize))
+
+        # Parse the header.
+        dataChecksum = int.from_bytes(saveData[0:4], 'little')
+        headerChecksum = int.from_bytes(saveData[4:8], 'little')
+        headerDataSize = int.from_bytes(saveData[8:12], 'little')
+        dataSize = int.from_bytes(saveData[12:16], 'little')
+
+        # Check that the header size is valid.
+        if headerDataSize > 100:
+        
+            # Park file is invalid.
+            print("Park has invalid header size!")
+            return False
+
+        # Verify the checksum of the header is correct.
+        headerChecksumNew = computeCRC(saveData[20:], headerDataSize)
+        if headerChecksumNew != headerChecksum:
+            print("Header checksum: Fixed")
+        else:
+            print("Header checksum: Valid")
+
+        # Save the new header checksum.
+        saveData[4:8] = int.to_bytes(headerChecksumNew, 4, 'little')
+
+        # Zero out the data checksum so we can verify it.
+        saveData[0:4] = [0, 0, 0, 0]
+
+        # Verify the checksum for the main block of save data.
+        dataChecksumNew = computeCRC(saveData, dataSize)
+        if dataChecksumNew != dataChecksum:
+            print("Data checksum: Fixed")
+        else:
+            print("Data checksum: Valid")
+
+        # Save the data checksum.
+        saveData[0:4] = int.to_bytes(dataChecksumNew, 4, 'little')
+
+        # Write the new save data back to file.
+        file.seek(0, 0)
+        file.write(saveData)
+
+        # Done, park file successfully processed.
+        return True
+        
+        
+    def signTonyHawksAmericanWasteland(self, args, file) -> bool:
+    
+        # Not supported.
+        print("Game not supported for this platform")
+
     
 class GamecubeSaveSigner:
+
+    def signTonyHawksProSkater3(self, args, file) -> bool:
+    
+        # Not supported.
+        print("Game not supported for this platform")
+        
 
     def signTonyHawksProSkater4(self, args, file) -> bool:
     
@@ -309,6 +386,12 @@ class GamecubeSaveSigner:
         file.write(saveBuffer)
             
         return True
+        
+        
+    def signTonyHawksAmericanWasteland(self, args, file) -> bool:
+    
+        # Not supported.
+        print("Game not supported for this platform")
     
     
     def packUnpackSaveBuffer(self, args, file) -> bool:
@@ -333,6 +416,106 @@ class GamecubeSaveSigner:
         return True
 
     
+class Xbox360SaveSigner:
+
+    def signTonyHawksProSkater3(self, args, file) -> bool:
+    
+        # Not supported.
+        print("Game not supported for this platform")
+        
+
+    def signTonyHawksProSkater4(self, args, file) -> bool:
+    
+        # Not supported.
+        print("Game not supported for this platform")
+        
+
+    def signTonyHawksAmericanWasteland(self, args, file) -> bool:
+    
+        # Get the size of the save file.
+        fileSize = getFileSize(file)
+        if fileSize != 0xC000:
+        
+            # File is invalid.
+            print("Error park file is incorrect size!")
+            return False
+
+        # Read the file into a buffer we can work with.
+        saveData = bytearray(file.read(fileSize))
+
+        # Parse the header.
+        dataChecksum = int.from_bytes(saveData[0:4], 'big')
+        headerChecksum = int.from_bytes(saveData[4:8], 'big')
+        headerDataSize = int.from_bytes(saveData[8:12], 'big')
+        dataSize = int.from_bytes(saveData[12:16], 'big')
+
+        # Parse the secondary header so we can determine if the same is packed or not.
+        nsMagic = int.from_bytes(saveData[96:98], 'big')
+        if nsMagic == 0x4E24:  # 'N$'
+            
+            # Save file needs to be packed before signing.
+            packUnpackSaveBufferGeneric(saveData, 96, 90, 0x4E24, True)
+
+        # Check that the header size is valid.
+        if headerDataSize > 100:
+        
+            # Park file is invalid.
+            print("Park has invalid header size!")
+            return False
+
+        # Verify the checksum of the header is correct.
+        headerChecksumNew = computeCRC(saveData[20:], headerDataSize)
+        if headerChecksumNew != headerChecksum:
+            print("Header checksum: Fixed")
+        else:
+            print("Header checksum: Valid")
+
+        # Save the new header checksum.
+        saveData[4:8] = int.to_bytes(headerChecksumNew, 4, 'big')
+
+        # Zero out the data checksum so we can verify it.
+        saveData[0:4] = [0, 0, 0, 0]
+
+        # Verify the checksum for the main block of save data.
+        dataChecksumNew = computeCRC(saveData, dataSize)
+        if dataChecksumNew != dataChecksum:
+            print("Data checksum: Fixed")
+        else:
+            print("Data checksum: Valid")
+
+        # Save the data checksum.
+        saveData[0:4] = int.to_bytes(dataChecksumNew, 4, 'big')
+
+        # Write the new save data back to file.
+        file.seek(0, 0)
+        file.write(saveData)
+
+        # Done, park file successfully processed.
+        return True
+        
+        
+    def packUnpackSaveBuffer(self, args, file) -> bool:
+    
+        # Check the file size to make sure it is correct.
+        if getFileSize(file) != 0xC000:
+        
+            # The file size is incorrect, we can not sign this file.
+            print('Error park file size is incorrect!')
+            return False
+
+        # Read the save file into a buffer.
+        saveBuffer = bytearray(file.read(0xC000))
+        
+        # Pack or unpack the save buffer.
+        packUnpackSaveBufferGeneric(saveData, 96, 90, 0x4E24, args.pack)
+        
+        # Write the new save data back to file.
+        file.seek(0, 0)
+        file.write(saveBuffer)
+            
+        return True
+    
+    
 def main() -> None:
 
     # Initialize argparse.
@@ -342,8 +525,6 @@ def main() -> None:
     parser.add_argument('savefile', help='Save game file')
 
     # Optional arguments.
-    parser.add_argument('-v', '--verify', help='Verify game save integrity', default=False, action='store_true')
-    #parser.add_argument('-s', '--sign', help='Resign game save', default=False, action='store_true')
     parser.add_argument('-d', '--debug', help='Sign the file for debug consoles (Xbox only)', default=False, action='store_true')
     parser.add_argument('-u', '--unpack', help='Unpacks (byte flips) save file data to little endian ordering (Xbox 360 and Gamecube only)', default=False, action='store_true')
     parser.add_argument('-p', '--pack', help='Packs (byte flips) save file data to big endian ordering (Xbox 360 and Gamecube only)', default=False, action='store_true')
@@ -354,7 +535,9 @@ def main() -> None:
     # Initialize save signer instances.
     saveSigners = {
         'xbox' : XboxSaveSigner(),
-        'gc' : GamecubeSaveSigner()
+        'ps2' : Ps2SaveSigner(),
+        'gc' : GamecubeSaveSigner(),
+        'xbox360' : Xbox360SaveSigner()
     }
 
     # Open the file for processing.
@@ -364,21 +547,6 @@ def main() -> None:
         # Failed to open the file for reading.
         print('Error opening file: \'%s\'' % args.savefile)
         return
-
-    # Verify we have at least one optional argument present.
-    #if args.verify is False and args.sign is False:
-    #    # We need at least one optional argument in order to process anything.
-    #    print("Must provide at least one optional argument to process save file!")
-    #    return
-
-    # Check if we are verifying or signing the game save.
-    #if args.verify is True:
-    #    # Verify the integrity of the save file.
-    #    verifyParkFile(fileHandle)
-
-    #elif args.sign is True:
-    #    # Sign the save file.
-    #    signParkFile(fileHandle)
     
     # Check for pack/unpack operations.
     if args.pack == True or args.unpack == True:
@@ -386,6 +554,8 @@ def main() -> None:
         # Pack/unpack the park file.
         match args.platform:
             case 'gc':
+                saveSigners[args.platform].packUnpackSaveBuffer(args, fileHandle)
+            case 'xbox360':
                 saveSigners[args.platform].packUnpackSaveBuffer(args, fileHandle)
             case _:
                 print("Platform '%s' does not support packing/unpacking" % args.platform)
