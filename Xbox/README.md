@@ -56,7 +56,7 @@ To compile the exploit files you'll need XePatcher 2.9 or newer, to compile the 
 ## Save Game Exploits
 The game save expoits can be compiled and applied to the save files using the following XePatcher command: 
 ```
-XePatcher.exe -p <patch file> -proc x86 -b <save game file>
+XePatcher.exe -p <patch file> -proc x86 -bin <save game file>
 
 Ex: XePatcher.exe -p ".\Xbox\Tony Hawk's Pro Skater 4\TonyHawkProSkater4-NTSC.asm" -proc x86 -bin ".\Release\Xbox\Tony Hawk's Pro Skater 4\NTSC\41560017\3DDF5FA578FC\3DDF5FA578FC"
 ```
