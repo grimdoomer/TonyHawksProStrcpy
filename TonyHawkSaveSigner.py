@@ -211,7 +211,6 @@ class XboxSaveSigner:
             saveBuffer[i] = 0
         
         # Parse the header.
-        startpos = 20
         headerChecksum = int.from_bytes(saveBuffer[20:24], 'little')
         headerDataSize = int.from_bytes(saveBuffer[24:28], 'little')
         dataSize = int.from_bytes(saveBuffer[28:32], 'little')
@@ -234,11 +233,11 @@ class XboxSaveSigner:
         saveBuffer[20:24] = int.to_bytes(headerChecksumNew, 4, 'little')
 
         # Compute the HMAC hash of the save file.
-        hash = self.__computeDigest(args.debug, self.THAW_SAVE_KEY, saveBuffer)
+        saveBuffer[0:20] = self.__computeDigest(args.debug, self.THAW_SAVE_KEY, saveBuffer)
 
-        # Seek to the beginning of the file and write the hash buffer.
+        # Seek to the beginning of the file and write the save buffer.
         file.seek(0, 0)
-        file.write(hash)
+        file.write(saveBuffer)
 
         # Done, return true.
         return True

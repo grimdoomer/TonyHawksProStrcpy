@@ -38,7 +38,7 @@ _gap_data_start:
         .byte   "Grim %r0x T0ny H4wk's S0x!"
 _1:     .fill   0x38 - (_1 - _gap_data_start), 1, 0x69
 
-        # +56 new %register values for function prolog
+        # +56 new register values for function prologue
 		.long	0x15151515	# %r15
 		.long	0x16161616	# %r16
 		.long	0x17171717	# %r17
@@ -160,6 +160,7 @@ _copy_loop:
 		
 		# Next block.
 		addi	%r30, %r30, 0x200
+		b		_copy_loop
 		
 _copy_done:
 
