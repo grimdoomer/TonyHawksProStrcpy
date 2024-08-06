@@ -15,7 +15,7 @@
 %define VtableThingAddress          1B2838h     ; Address of the vtable thing we overwrite with our shellcode
 %define ParkFileHeaderAddress       27F140h     ; Address of where the first 136 bytes of the park file get put on to the data segment
 
-%define ShellCodeSize				(_shell_code_end - _shell_code_start)	; Size of the shell code data
+%define ShellCodeSize               (_shell_code_end - _shell_code_start)   ; Size of the shell code data
 
 ;---------------------------------------------------------
 ; Shellcode Copier: copies the main shell code from the heap to the data segment
@@ -203,7 +203,7 @@ SetLEDColor:
         retn    4
 
         align 4, db 0
-		
+        
 krnlimports:
         HalReturnToFirmware             dd 49
         LaunchDataPage                  dd 164
