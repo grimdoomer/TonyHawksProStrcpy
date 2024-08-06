@@ -19,7 +19,7 @@ Only a network exploit is available for PS2, save game exploits have not been de
 **Other Region** = Save game exploit for other regions
 
 ## Network Exploit
-The network exploit has been tested using PCSX2 for the host console and a phat Playstation 2 console as the client. Running the host setup from a real PS2 console has not been tested but should work. Pre-compiled patch files can be found in the Releases section.
+Pre-compiled patch files/game saves can be found in the Releases section. The network exploit has been tested using PCSX2 for the host and a phat Playstation 2 console as the client. Running the host setup from a real PS2 console has not been tested but should work.
 
 To prep the PCSX2 host:
 1. Extract the Tony Hawk's Pro Skater 4 ISO to a folder on your computer.
@@ -56,7 +56,7 @@ Some elf files may not launch or cause issues on the client's side. This is beca
 
 # Compiling
 Preping the game executable and compiling patches for the network exploit will require either WSL or a linux VM/machine. You'll need to install the [Ps2Toolchain](https://github.com/ps2dev/ps2toolchain) to be able to use the mips64r5900el-ps2 GNU tools. You'll also need the following tools:
-- XePatcher 3.0 or newer
+- [XePatcher 3.0](http://icode4.coffee/files/XePatcher_3.0.zip) or newer
 - [Mymc](https://github.com/ps2dev/mymc) python 2.7 script
 - An ISO extractor/rebuilder tool, I used ImgBurn
 
@@ -130,7 +130,7 @@ XePatcher.exe -pb <compiled patch file> -elf <patched elf file>
 Ex: XePatcher.exe -pb .\bin\TonyHawkProSkater4-Lan-Host-NTSC.bin -elf SLUS_205.04_patched
 ```
 
-Lastly you'll need to replace the "SLUS_205.04" file in the game ISO with the "SLUS_205.04_patched" file you created. Don't forget to include your PAYLOAD.ELF file in the ISO as well. I used ImgBurn to rebuild the game ISO from the extracted files, here's an example commnd on how to do that:
+Lastly you'll need to replace the "SLUS_205.04" file in the game ISO with the "SLUS_205.04_patched" file you created. Don't forget to include your PAYLOAD.ELF file in the ISO as well. I used ImgBurn to rebuild the game ISO from the extracted files, here's an example command on how to do that:
 ```
 ImgBurn.exe /MODE BUILD /OUTPUTMODE IMAGEFILE /SRC <src directory> /DEST <output iso file> /OVERWRITE YES /ROOTFOLDER YES /START /CLOSE /VOLUMELABEL "Tony Hawk Pro Skater 4" /NOIMAGEDETAILS
 ```
