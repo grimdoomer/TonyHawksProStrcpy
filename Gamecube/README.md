@@ -18,6 +18,8 @@
 **Other Region** = Save game exploit for other regions
 
 ## Save Game Exploit
+Pre-patched game save files can be found in the Releases section.
+
 1. Copy the "52-GT4E-NGCkwhjnlgcNGCkwhjnlgc.gci" save file to your memory card. You'll need an already modded gamecube or wii console to do this.
 2. Copy your homebrew boot.gci file to your memory card, you can obtain this from the latest swiss release in the "GCI" folder.
 3. Launch the Tony Hawk game you're using for the exploit and choose free skate option from the main menu.
@@ -25,7 +27,7 @@
 5. After the save is loaded choose "start game". The exploit will trigger during the loading screen and your homebrew boot.gci file should run.
 
 # Compiling
-To compile the exploit files you need XePatcher 3.0 or newer.
+To compile the exploit files you need [XePatcher 3.0](http://icode4.coffee/files/XePatcher_3.0.zip) or newer.
 
 The clean "52-GT4E-NGCkwhjnlgcNGCkwhjnlgc.gci" file first needs to be unpacked (byte flipped) before the patch can be applied. Use the following command to unpack the save file:
 ```
