@@ -19,7 +19,7 @@ Exploits exist in both save game and system link forms, please follow the instru
 **Other Region** = Save game exploit for other regions
 
 ## Save Game Exploit
-Save game exploits in the releases download have already been signed. Please use the save game files that match the region of your game.
+Save game exploits in the releases section are pre-patched and have already been signed for retail consoles. Please use the save game files that match the region of your game.
 
 1. Each save has a placeholder 'default.xbe' file that needs to be replaced with the xbe you want to launch that's signed using the habibi RSA key. See [Xbe Signing](#xbe-signing) for instructions on how to do this. For demonstration purposes you can find the pre-signed "nyan-cat" test xbe in the "TonyHawksProStrcpy-Demo-Executables.zip" file in the releases section.
 2. Once your xbe has been signed and copied into the 41560XXX\3DDF5FA578FC folder you can copy the 41560XXX folder to your memory card and then transfer it to your console's HDD. The save must be loaded from your console's HDD, loading it from the memory card is not supported.
@@ -51,10 +51,10 @@ During the exploit the client's console will change the LED color to indicate wh
 - Green: file transfer completed.
 
 # Compiling
-To compile the exploit files you'll need XePatcher 2.9 or newer, to compile the host xbe pathes for the system link exploit you'll also need [XboxImageXploder](https://github.com/grimdoomer/XboxImageXploder).
+To compile the exploit files you'll need XePatcher 2.9 or newer, to compile the host xbe patches for the system link exploit you'll also need [XboxImageXploder](https://github.com/grimdoomer/XboxImageXploder).
 
 ## Save Game Exploits
-The game save expoits can be compiled and applied to the save files using the following XePatcher command: 
+The game save exploits can be compiled and applied to the save files using the following XePatcher command: 
 ```
 XePatcher.exe -p <patch file> -proc x86 -bin <save game file>
 
