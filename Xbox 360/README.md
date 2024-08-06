@@ -17,17 +17,22 @@ The strcpy bug can be used on any kernel version to get ROP execution but withou
 **Other Region** = Save game exploit for other regions
 
 ## Save Game Exploit
-The save game exploit files for Xbox 360 include a gamer profile and hacked park file that are pre-signed for retail/devkit consoles. You must copy these files to your console's HDD, loading them from a memory card or other storage device is not supported!
+The save game exploit files for Xbox 360 in the releases section include a gamer profile and hacked park file that are pre-signed for retail/devkit consoles. They can be copied to your console with no additional steps needed to resign them. You must copy these files to your console's HDD, loading them from a memory card or other storage device is not supported!
 
-1. Copy the <TODO> folder to Partition1\Content folder of your HDD (where the user profiles go).
-2. Copy your boot.xex file to the root of partition 1 (it should be next to the "Content" folder).
+1. Copy the E0000XXXXXXXXXXX folder for your console type (retail or devkit) to Partition1\Content folder of your HDD (where the gamer profiles go).
+2. Copy your boot.xex file to the root of partition 1 (it should be next to the "Content" folder). The xex file must be in retail format and have all restrictions removed, see the [Xex Signing](#xex-signing) section for how to do this. For demonstration purposes you can find a demo boot.xex in the "TonyHawksProStrcpy-Demo-Executables.zip" file in the releases section.
 3. Launch Tony Hawk's American Wasteland.
+4. Sign into the Player1 gamer profile.
+5. Choose "Free skate" and once you get to the level select screen choose "custom park" and load the "Hack Xbox" park file.
+6. Press "start game" and the exploit should trigger during the loading screen.
+
+The console's ring of light (RoL) should change to solid orange if the exploit gets hypervisor code execution successfully. If the RoL doesn't change to orange then you're most likely on the wrong kernel version (must be 4548). If the RoL changes to orange but you get kicked to the dashboard or get an error along the lines of "could not start this game" it means your boot.xex file was either not found or is not in the correct format.
 
 ### Notes
 - The exploit is based around the release version of the game. I don't believe a title update was every released for this game but if one was you'll need to clear that from your HDD before running the exploit.
 
 # Compiling
-To compile the patch file you'll need XePatcher 2.9 or newer, as well as an Xbox 360 container/save game tool that can extract/inject files into Xbox 360 game saves and resign them. See the [Game Save Signing](#Game_Save_signing) section for more information. This repository is not focused on how to resign the game save files and assumes you already have knowleged of how to do this.
+To compile the patch file you'll need XePatcher 2.9 or newer, as well as an Xbox 360 container/save game tool that can extract/inject files into Xbox 360 game saves and resign them. See the [Game Save Signing](#game-save-signing) section for more information. This repository is not focused on how to resign the game save files and assumes you already have knowleged of how to do this.
 
 Open the "E0000XXXXXXXXXXX\415607D4\00000001\Hack Xbox-Park" file for the console type you want to compile the game save for in an Xbox 360 container tool. Extract the "Hack Xbox-Park" file inside of the container (I'll refer to the extracted file as "hack_xbox.prk" from here on).
 
