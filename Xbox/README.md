@@ -32,12 +32,12 @@ The system link exploit is currently only supported on the NTSC version of Tony 
 
 The exploit files for the host have only been tested on an Xbox console, it's unknown if they work using an emulator or not. The host must patch their game xbe with the "TonyHawkProSkater4-SystemLink-Host-NTSC" patch and load the save game file in the "SystemLink" folder. The other game saves will NOT work with the network exploit.
 
-1. Use [XDelta](https://www.romhacking.net/utilities/598/) to patch a clean NTSC Tony Hawk's Pro Skater 4 xbe with the "TonyHawkProSkater4-SystemLink-Host-NTSC" patch file.
+1. Use [XDelta](https://www.romhacking.net/utilities/598/) to patch a clean NTSC Tony Hawk's Pro Skater 4 xbe with the "Xbox\Tony Hawk's Pro Skater 4\NTSC\SystemLink\TonyHawkProSkater4-SystemLink-default.xbe.xdelta" patch file.
 2. Sign your launcher xbe with the habibi RSA key using xbedump found on xbins. See [Xbe Signing](#xbe-signing) for instructions on how to do this. For demonstration purposes you can find the pre-signed "nyan-cat" test xbe in the "TonyHawksProStrcpy-Demo-Executables.zip" file in the releases section.
-3. Replace the placeholder 'default.xbe' file in the "SystemLink\41560017\3DDF5FA578FC" folder with your signed launcher xbe.
+3. Replace the placeholder 'default.xbe' file in the "Xbox\Tony Hawk's Pro Skater 4\NTSC\SystemLink\41560017\3DDF5FA578FC" folder with your signed launcher xbe.
 4. Copy the patched xbe and 41560017 save folder to a modded xbox console. The xbe goes in the game directory (ex: F:\Games\THPS4\) and the save folder goes into E:\UDATA.
-5. Run the patched xbe file and select "system link" from the main menu.
-6. When you get to the level select screen choose "custom park" and load the "Hack Xbox" game save.
+5. Run the patched xbe file and select "System Link" from the main menu.
+6. When prompted choose "Host Game" and change the level to "custom park" and load the "Hack Xbox" game save.
 7. Start the network match.
 8. Have the client join the host's game (over LAN or tunneling software).
 9. When the client joins their console's LED should change colors and they should spawn into the game.
