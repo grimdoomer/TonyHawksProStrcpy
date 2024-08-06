@@ -1,5 +1,5 @@
 # Tony Hawk's Pro Strcpy
-Tony Hawk's Pro Strcpy is a strcpy exploit that exists in the Tony Hawk's Pro Skater video game series and can be used to hack several different game consoles including Xbox, Xbox 360, Playstation 2, and Gamecube. This repository contains the exploit code and pre-made save game files that can be used to hack several different gaming consoles, as well as RCE variants that can be used to hack certain game consoles remotely though network/LAN matches.
+Tony Hawk's Pro Strcpy is a game save/network RCE exploit that can be used to hack several different game consoles including Xbox, Xbox 360, Playstation 2, and Gamecube. This repository contains the exploit code and pre-made save game files that can be used to hack several different gaming consoles, as well as RCE variants that can be used to hack certain game consoles remotely though network/LAN matches.
 
 This exploit is intended to be used for hacking your own console and educational purposes only. Please do not use it maliciously. Also note that this is not the only strcpy bug that can be exploited over the network. Anyone still playing the exploitable Tony Hawk games should be extremely careful when using network play with people you don't know.
 
