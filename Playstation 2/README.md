@@ -19,14 +19,14 @@ Only a network exploit is available for PS2, save game exploits have not been de
 **Other Region** = Save game exploit for other regions
 
 ## Network Exploit
-The network exploit has been tested using PCSX2 for the host console and a phat Playstation 2 console as the client. Running the host setup from a real PS2 console has not been tested but should work.
+The network exploit has been tested using PCSX2 for the host console and a phat Playstation 2 console as the client. Running the host setup from a real PS2 console has not been tested but should work. Pre-compiled patch files can be found in the Releases section.
 
 To prep the PCSX2 host:
 1. Extract the Tony Hawk's Pro Skater 4 ISO to a folder on your computer.
-2. Use [XDelta](https://www.romhacking.net/utilities/598/) to apply the "TonyHawkProSkater4-Lan-SLUS_205.04" patch file to the "SLUS_205.04" file extracted in step 1.
+2. Use [XDelta](https://www.romhacking.net/utilities/598/) to apply the "Playstation 2\Tony Hawk's Pro Skater 4\NTSC\TonyHawkProSkater4-Lan-SLUS_205.04.xdelta" patch file to the "SLUS_205.04" file extracted in step 1.
 3. Rebuild the ISO using the patched "SLUS_205.04" file and your PAYLOAD.ELF file which is any elf file you want to send to the client. There are some requirements for what elf files can be used, see the [Payload Elf](#payload-elf) section for more information. See [Executable patch](#executable-patch) section for an example ImgBurn command to rebuild the ISO.
 4. Run PCSX2 and configure the following options:
-   - Assign the "THPS4-Host-Lan-VMC.ps2" file to memory card slot 1
+   - Assign the "Playstation 2\Tony Hawk's Pro Skater 4\NTSC\THPS4-Host-Lan-VMC.ps2" file to memory card slot 1
    - Enable the network adapter/ethernet port, set the device type to "PCAP Bridged" and select your PC's network interface (either your ethernet port or wifi connection)
 5. Boot the rebuilt game ISO and select "Network Play" and configure the network adapter.
 
@@ -50,7 +50,7 @@ To run the exploit:
 ### Payload Elf
 The PAYLOAD.ELF file can be any elf file you want to send to the client and have them run. I recommend using uLaunchElf which will allow the client console to boot FreeMcBoot installer from a usb stick and softmod their console. 
 
-Any elf can be used but it must be self contained, the elf cannot load any additional files from another storage device (because the client won't have them on their console). The elf file will be launched from RAM so the smaller the better. It's also recommended to compress the elf file using [Ps2-Packer(https://github.com/ps2dev/ps2-packer) as these will have an easier time booting than a non-compressed elf. 
+Any elf can be used but it must be self contained, the elf cannot load any additional files from another storage device (because the client won't have them on their console). The elf file will be launched from RAM so the smaller the better. It's also recommended to compress the elf file using [Ps2-Packer](https://github.com/ps2dev/ps2-packer) as these will have an easier time booting than a non-compressed elf. 
 
 Some elf files may not launch or cause issues on the client's side. This is because the elf file is downloaded to RAM (there's no common persistent storage mechanism on all PS2 consoles like the internal HDD on an Xbox), and then has to be loaded at the correct base address for it to function. Essentially, you'll need to fit two copies of the elf in RAM at different locations before it will run. This is why it's recommended to use ps2-packer as it will decrease the elf size and the decompression stub it uses will require the elf be loaded at the end of RAM, away from where the game is loaded.
 
