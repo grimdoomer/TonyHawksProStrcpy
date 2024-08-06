@@ -51,7 +51,7 @@ During the exploit the client's console will change the LED color to indicate wh
 - Green: file transfer completed.
 
 # Compiling
-To compile the exploit files you'll need XePatcher 2.9 or newer, to compile the host xbe patches for the system link exploit you'll also need [XboxImageXploder](https://github.com/grimdoomer/XboxImageXploder).
+To compile the exploit files you'll need [XePatcher 3.0](http://icode4.coffee/files/XePatcher_3.0.zip) or newer, to compile the host xbe patches for the system link exploit you'll also need [XboxImageXploder v1.1](https://github.com/grimdoomer/XboxImageXploder) or newer.
 
 ## Save Game Exploits
 The game save exploits can be compiled and applied to the save files using the following XePatcher command: 
@@ -80,7 +80,7 @@ You must use the correct game id for the version of the game you're patching or 
 ## SystemLink Exploit
 The save game for the system link exploit can be compiled using the instructions above with the "TonyHawksProSkater4-SystemLink-NTSC.asm" file. It must be applied to the Tony Hawk's Pro Skater 4 save file.
 
-To build the host xbe file you must first use XboxImageXploder v1.1 to add a new code segment to a clean default.xbe from the NTSC version of the game (SHA1: 22607A9C6DA95813884139E8A20971C4C3D23517):
+To build the host xbe file you must first use XboxImageXploder to add a new code segment to a clean default.xbe from the NTSC version of the game (SHA1: 22607A9C6DA95813884139E8A20971C4C3D23517):
 ```
 XboxImageXploder.exe <xbe file> .hacks 4096
 ```
