@@ -17,7 +17,7 @@ The strcpy bug can be used on any kernel version to get ROP execution but withou
 **Other Region** = Save game exploit for other regions
 
 ## Save Game Exploit
-The save game exploit files for Xbox 360 include a gamer profile and hacked park file that are pre-signed for retail consoles. You must copy these files to your console's HDD, loading them from a memory card or other storage device is not supported!
+The save game exploit files for Xbox 360 include a gamer profile and hacked park file that are pre-signed for retail/devkit consoles. You must copy these files to your console's HDD, loading them from a memory card or other storage device is not supported!
 
 1. Copy the <TODO> folder to Partition1\Content folder of your HDD (where the user profiles go).
 2. Copy your boot.xex file to the root of partition 1 (it should be next to the "Content" folder).
@@ -27,7 +27,45 @@ The save game exploit files for Xbox 360 include a gamer profile and hacked park
 - The exploit is based around the release version of the game. I don't believe a title update was every released for this game but if one was you'll need to clear that from your HDD before running the exploit.
 
 # Compiling
+To compile the patch file you'll need XePatcher 2.9 or newer, as well as an Xbox 360 container/save game tool that can extract/inject files into Xbox 360 game saves and resign them. See the [Game Save Signing](#Game_Save_signing) section for more information. This repository is not focused on how to resign the game save files and assumes you already have knowleged of how to do this.
 
+Open the "E0000XXXXXXXXXXX\415607D4\00000001\Hack Xbox-Park" file for the console type you want to compile the game save for in an Xbox 360 container tool. Extract the "Hack Xbox-Park" file inside of the container (I'll refer to the extracted file as "hack_xbox.prk" from here on).
+
+Unpack the hack_xbox.prk save file (byte flip) using the following command:
+```
+python TonyHawkSaveSigner.py thaw xbox360 <hack_xbox.prk file> -u
+```
+
+You should get the following output:
+```
+Save status: packed
+Save is now unpacked
+```
+
+Save file status MUST be unpacked or the patch will not apply correctly.
+
+Next you can apply the patch using the following XePatcher command:
+```
+XePatcher.exe -p <patch file> -proc ppc -bin <hack_xbox.prk file>
+
+Ex: XePatcher.exe -p TonyHawkAmericanWasteland-NTSC-Retail.asm -proc ppc -bin hack_xbox.prk
+```
+
+You should get the following output:
+```
+Save status: unpacked
+Save is now packed
+Header checksum: Valid
+Data checksum: Fixed
+Successfully signed 'hack_xbox.prk'
+```
+
+Finally, you can use your Xbox 360 container/game save tool to inject the hack_xbox.prk file back into the "Hack Xbox-Park" container file. Note the file inside of the container must have its original file name (ie: you want to replace the file in the container and not inject the hack_xbox.prk file as a new file). You MUST also resign the container file after modifying it.
+
+# Game Save Signing
+Xbox 360 game saves are stored in a container file that has a strong cryptographic signature applied. To resign the game save files you'll need an Xbox 360 container/save game tool that can extract/inject files into Xbox 360 game saves and resign them. These tools also require an Xbox 360 keyvault file to resign game save files and will typically come with a retail keyvault file included. To sign the game save for Xbox 360 devkits you'll need to replace the keyvault file with a devkit keyvault file (retail game save must be signed with retail keyvault, devkit game save must be signed with devkit keyvault). Additionally, the game save and Xbox 360 gamer profile must have matching profile IDs or else the game save won't get detected.
+
+This repository is not focused on how to resign the game save files and assumes you already have knowleged of how to do this. The profile/game save files included in the repo are already signed for their respective console types and have matching IDs, etc. The profile/game saves files in the releases section have already been signed for their respective platforms and only need to be copied to the console's HDD.
 
 # Xex Signing
 The "boot.xex" file must be in retail format and have all restrictions removed. This can be done with XexTool using the following command:
