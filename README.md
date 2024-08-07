@@ -18,5 +18,6 @@ The strcpy bug exists in the loading code for custom skate parks created with th
 
 This bug exists in several different versions of the game and can even be used over the network via LAN matches to remotely hack clients without the need for them to obtain the hacked save files. For detailed information on how the exploit works for each game console see the notes in the exploit source files.
 
+Also check out my [blog post](https://icode4.coffee/?p=954) which details how the bug and exploits work.
 
 Logo template from: [bekoha](https://github.com/bekoha/bekoha.github.io)
