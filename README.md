@@ -11,7 +11,7 @@ For instructions on how to use the exploits, what versions of the game are suppo
 - [Xbox](/Xbox)
 - [Playstation 2](/Playstation%202)
 - [Gamecube](/Gamecube)
-- [Xbox 360](/XBox%20360)
+- [Xbox 360](/Xbox%20360)
 
 ## The strcpy bug
 The strcpy bug exists in the loading code for custom skate parks created with the "create a park" feature. The park editor allows players to create custom levels and one of the features lets you create a "gap" (a skateboarding term for an area between two platforms one must jump over) and name it up to 31 characters. By maliciously crafting a custom gap name in the park file you can trigger a stack/heap overflow and get control of the CPU instruction pointer. This can then be used to start a ROP chain (or execute shell code) and further exploit the console for full code execution. 
