@@ -21,7 +21,7 @@ Exploits exist in both save game and system link forms, please follow the instru
 ## Save Game Exploit
 Save game exploits in the releases section are pre-patched and have already been signed for retail consoles. Please use the save game files that match the region of your game.
 
-1. Each save has a placeholder 'default.xbe' file that needs to be replaced with the xbe you want to launch that's signed using the habibi RSA key. See [Xbe Signing](#xbe-signing) for instructions on how to do this. For demonstration purposes you can find the pre-signed "nyan-cat" test xbe in the "TonyHawksProStrcpy-Demo-Executables.zip" file in the releases section.
+1. Each save has a placeholder 'default.xbe' file that needs to be replaced with the xbe you want to launch that's signed using the habibi RSA key. See [Xbe Signing](#xbe-signing) for instructions on how to do this. For demonstration purposes you can find the pre-signed "nyan-cat" test xbe in the "Demo-Executables.zip" file in the releases section.
 2. Once your xbe has been signed and copied into the 41560XXX\3DDF5FA578FC folder you can copy the 41560XXX folder to your memory card and then transfer it to your console's HDD. The save must be loaded from your console's HDD, loading it from the memory card is not supported.
 3. Launch the Tony Hawk game you're using for the exploit and choose the free skate option from the main menu (varies slightly per game).
 4. When you get to the level select screen choose "custom park" and load the "Hack Xbox" game save.
@@ -33,7 +33,7 @@ The system link exploit is currently only supported on the NTSC version of Tony 
 The exploit files for the host have only been tested on an Xbox console, it's unknown if they work using an emulator or not. The host must patch their game xbe with the "TonyHawkProSkater4-SystemLink-Host-NTSC" patch and load the save game file in the "SystemLink" folder. The other game saves will NOT work with the network exploit.
 
 1. Use [XDelta](https://www.romhacking.net/utilities/598/) to patch a clean NTSC Tony Hawk's Pro Skater 4 xbe with the "Xbox\Tony Hawk's Pro Skater 4\NTSC\SystemLink\TonyHawkProSkater4-SystemLink-default.xbe.xdelta" patch file.
-2. Sign your launcher xbe with the habibi RSA key using xbedump found on xbins. See [Xbe Signing](#xbe-signing) for instructions on how to do this. For demonstration purposes you can find the pre-signed "nyan-cat" test xbe in the "TonyHawksProStrcpy-Demo-Executables.zip" file in the releases section.
+2. Sign your launcher xbe with the habibi RSA key using xbedump found on xbins. See [Xbe Signing](#xbe-signing) for instructions on how to do this. For demonstration purposes you can find the pre-signed "nyan-cat" test xbe in the "Demo-Executables.zip" file in the releases section.
 3. Replace the placeholder 'default.xbe' file in the "Xbox\Tony Hawk's Pro Skater 4\NTSC\SystemLink\41560017\3DDF5FA578FC" folder with your signed launcher xbe.
 4. Copy the patched xbe and 41560017 save folder to a modded xbox console. The xbe goes in the game directory (ex: F:\Games\THPS4\) and the save folder goes into E:\UDATA.
 5. Run the patched xbe file and select "System Link" from the main menu.
