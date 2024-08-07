@@ -20,7 +20,7 @@ The strcpy bug can be used on any kernel version to get ROP execution but withou
 The save game exploit files for Xbox 360 in the releases section include a gamer profile and hacked park file that are pre-signed for retail/devkit consoles. They can be copied to your console with no additional steps needed to resign them. You must copy these files to your console's HDD, loading them from a memory card or other storage device is not supported!
 
 1. Copy the E0000XXXXXXXXXXX folder for your console type (retail or devkit) to Partition1\Content folder of your HDD (where the gamer profiles go).
-2. Copy your boot.xex file to the root of partition 1 (it should be next to the "Content" folder). The xex file must be in retail format and have all restrictions removed, see the [Xex Signing](#xex-signing) section for how to do this. For demonstration purposes you can find a demo boot.xex in the "TonyHawksProStrcpy-Demo-Executables.zip" file in the releases section.
+2. Copy your boot.xex file to the root of partition 1 (it should be next to the "Content" folder). The xex file must be in retail format and have all restrictions removed, see the [Xex Signing](#xex-signing) section for how to do this. For demonstration purposes you can find a demo boot.xex in the "Demo-Executables.zip" file in the releases section.
 3. Launch Tony Hawk's American Wasteland.
 4. Sign into the Player1 gamer profile.
 5. Choose "Free skate" and once you get to the level select screen choose "custom park" and load the "Hack Xbox" park file.
