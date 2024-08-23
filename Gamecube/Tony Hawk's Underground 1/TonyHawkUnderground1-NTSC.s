@@ -59,7 +59,7 @@ _1:     .fill   0x38 - (_1 - _gap_data_start), 1, 0x69
         .long   0x30303030  # %r30
         .long   0x31313131  # %r31
         .long   0xFFFFFFFF
-        .long   SaveBufferMemoryAddress + GapDataStartFileOffset + (_gap_data_end - _gap_data_start) + 28    # lr
+        .long   SaveBufferMemoryAddress + GapDataStartFileOffset + (_gap_data_end - _gap_data_start)    # lr
         .long   0x00000000              #
         
         # Align shell code to 4-byte boundary based on memory address of save data.
@@ -70,7 +70,7 @@ _gap_data_end:
 #---------------------------------------------------------
 # Alignment patch
 #---------------------------------------------------------
-.long   0x8030
+.long   0xc030
 .long   (_alignment_end - _alignment_start)
 
 _alignment_start:
@@ -127,7 +127,6 @@ _shell_code_start:
         addi    %r5, %r1, StackSize+CardInfo
         lis     %r4, ((Hack_MemCardBootFile >> 16) & 0xFFFF)
         ori     %r4, %r4, (Hack_MemCardBootFile & 0xFFFF)
-        addi    %r4, %r4, 28
         li      %r3, 0
         FUNC_CALL   CARDOpen
         
@@ -180,7 +179,6 @@ _copy_done:
         li      %r5, Hack_LoaderStubSize
         lis     %r4, ((Hack_LoaderStub >> 16) & 0xFFFF)
         ori     %r4, %r4, (Hack_LoaderStub & 0xFFFF)
-        addi    %r4, %r4, 28
         mr      %r3, %r29
         FUNC_CALL   memcpy
         
