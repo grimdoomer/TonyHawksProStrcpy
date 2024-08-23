@@ -1,4 +1,6 @@
 *.bin
+!loader.bin
+
 build_game_saves.bat
 
 \Release
