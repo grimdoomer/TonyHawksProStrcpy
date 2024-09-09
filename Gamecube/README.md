@@ -4,7 +4,7 @@
 | --- | --- | --- | --- | --- | --- |
 | Tony Hawk's Pro Skater 3 | N/A | ✖ | ✖ | N/A | |
 | Tony Hawk's Pro Skater 4 | N/A | ✔ | ✖ | ✖ | |
-| Tony Hawk's Underground 1 | N/A | ✖ | ✖ | ✖ | |
+| Tony Hawk's Underground 1 | N/A | ✔ | ✖ | ✖ | |
 | Tony Hawk's Underground 2 | N/A | ✖ | ✖ | ✖ | |
 | Tony Hawk's American Wasteland | N/A | ✖ | ✖ | N/A | |
 
