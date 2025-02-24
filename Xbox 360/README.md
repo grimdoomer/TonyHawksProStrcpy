@@ -56,6 +56,11 @@ XePatcher.exe -p <patch file> -proc ppc -bin <hack_xbox.prk file>
 Ex: XePatcher.exe -p TonyHawkAmericanWasteland-NTSC-Retail.asm -proc ppc -bin hack_xbox.prk
 ```
 
+Finally you must re-pack and fix the checksums on the save file using the following command:
+```
+python TonyHawkSaveSigner.py thaw xbox360 <save file>
+```
+
 You should get the following output:
 ```
 Save status: unpacked
